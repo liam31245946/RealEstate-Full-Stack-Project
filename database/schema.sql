@@ -18,7 +18,6 @@ CREATE TABLE "users" (
 
 CREATE TABLE "properties" (
   "propertyId" serial PRIMARY KEY,
-  "title" text,
   "description" text,
   "price" integer,
   "size" integer,
@@ -31,6 +30,7 @@ CREATE TABLE "properties" (
   "zipCode" text,
   "agentId" integer,
   "status" text,
+  "imageUrl" json,
   "createdAt" timestamptz,
   "approvedBy" integer,
   "approvedDate" timestamptz

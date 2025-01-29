@@ -1,35 +1,22 @@
-import { useEffect, useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { Routes, Route } from 'react-router-dom';
+import { Navbar } from './components/Navbar';
+import { Home } from './pages/Home';
+import { PropertyDetails } from './pages/PropertyDetails';
+import { AuthPage } from './pages/AuthPages';
+import { UserProvider } from './components/UserContext';
+import { NotFound } from './pages/notFound';
 
 export default function App() {
-  const [serverData, setServerData] = useState('');
-
-  useEffect(() => {
-    async function readServerData() {
-      const resp = await fetch('/api/hello');
-      const data = await resp.json();
-
-      console.log('Data from server:', data);
-
-      setServerData(data.message);
-    }
-
-    readServerData();
-  }, []);
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>{serverData}</h1>
-    </>
+    <UserProvider>
+      <Navbar /> {/* Navbar appears on all pages */}
+      <Routes>
+        <Route index element={<Home />} />
+        <Route path="/property/:propertyId" element={<PropertyDetails />} />
+        <Route path="/sign-up" element={<AuthPage mode="sign-up" />} />
+        <Route path="/sign-in" element={<AuthPage mode="sign-in" />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </UserProvider>
   );
 }

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useUser } from '../components/useUser';
 import { Property, readPropertiesAllUser } from '../lib';
 import { Link } from 'react-router-dom';
-import { PropertyDetails } from './PropertyDetails';
 import { Select } from './Select';
 import { MinPrice } from './MinPrice';
 import { MaxPrice } from './MaxPrice';
@@ -142,11 +141,6 @@ function PropertyCard({ property }: CardProps) {
           <span>🛁 {bathrooms} Baths</span>
           <span>📏 {size} sq ft</span>
         </div>
-        <button
-          className="mt-4 bg-white text-black px-4 py-2 rounded-md font-bold hover:bg-gray-300"
-          onClick={() => PropertyDetails()}>
-          View Details
-        </button>
       </div>
     </Link>
   );

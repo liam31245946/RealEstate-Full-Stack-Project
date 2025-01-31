@@ -55,6 +55,14 @@ const db = new pg.Pool({
 const app = express();
 app.use(express.json());
 
+// Create paths for static directories
+const reactStaticDir = new URL('../client/dist', import.meta.url).pathname;
+const uploadsStaticDir = new URL('public', import.meta.url).pathname;
+
+app.use(express.static(reactStaticDir));
+// Static directory for file uploads server/public/
+app.use(express.static(uploadsStaticDir));
+
 // sign in and sing out section Start
 app.post('/api/auth/sign-up', async (req, res, next) => {
   try {
@@ -244,6 +252,111 @@ app.delete(
   }
 );
 
+// Agent can update properties
+app.put(
+  '/api/properties/:propertyId',
+  authMiddleware,
+  uploadsMiddleware.single('image'),
+  async (req, res, next) => {
+    try {
+      const { propertyId } = req.params;
+      if (!Number.isInteger(+propertyId)) {
+        throw new ClientError(400, 'propertyId needs to be a number');
+      }
+      const {
+        description,
+        price,
+        status,
+        size,
+        bedrooms,
+        bathrooms,
+        features,
+        city,
+        state,
+        zipCode,
+        numberAndStreet,
+        imageUrl,
+      } = req.body;
+
+      const update = [];
+      const values = [];
+      values.push(propertyId);
+      values.push(req.user?.userId);
+      let i = 3;
+
+      if (description) {
+        update.push(`"description" =$${i++}`);
+        values.push(description);
+      }
+      if (price) {
+        update.push(`"price" =$${i++}`);
+        values.push(price);
+      }
+      if (status) {
+        update.push(`"status" =$${i++}`);
+        values.push(status);
+      }
+      if (size) {
+        update.push(`"size" =$${i++}`);
+        values.push(size);
+      }
+      if (bedrooms) {
+        update.push(`"bedrooms" =$${i++}`);
+        values.push(bedrooms);
+      }
+      if (bathrooms) {
+        update.push(`"bathrooms" =$${i++}`);
+        values.push(bathrooms);
+      }
+      if (features) {
+        update.push(`"features" =$${i++}`);
+        values.push(features);
+      }
+      if (city) {
+        update.push(`"city" =$${i++}`);
+        values.push(city);
+      }
+      if (state) {
+        update.push(`"state" =$${i++}`);
+        values.push(state);
+      }
+      if (zipCode) {
+        update.push(`"zipCode" =$${i++}`);
+        values.push(zipCode);
+      }
+      if (numberAndStreet) {
+        update.push(`"numberAndStreet" =$${i++}`);
+        values.push(numberAndStreet);
+      }
+      if (imageUrl) {
+        update.push(`"imageUrl" =$${i++}`);
+        values.push(imageUrl);
+      }
+
+      if (update.length === 0) {
+        throw new ClientError(400, 'Please provide what you want to update');
+      }
+
+      const sql = `
+    update "properties"
+    set ${update}
+    where "propertyId"=$1 and "agentId"=$2
+    returning *
+    `;
+      console.log(update, values, sql);
+
+      const result = await db.query(sql, values);
+      const updatedProperty = result.rows[0];
+      if (!updatedProperty) {
+        throw new ClientError(404, 'Entry not found');
+      }
+      res.status(200).json(updatedProperty);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 //  Implement Filter
 
 app.get('/api/properties', async (req, res, next) => {
@@ -383,7 +496,7 @@ app.post('/api/favorites/', authMiddleware, async (req, res, next) => {
       values ($1, $2)
       returning *;
      `;
-    const params = [propertyId, userId];
+    const params = [userId, propertyId];
     const result = await db.query(sql, params);
     const addFav = result.rows[0];
     res.status(201).json({ addFav });
@@ -602,16 +715,6 @@ app.post(
 );
 
 /* review backend End */
-
-// Create paths for static directories
-const reactStaticDir = new URL('../client/dist', import.meta.url).pathname;
-const uploadsStaticDir = new URL('public', import.meta.url).pathname;
-
-app.use(express.static(reactStaticDir));
-// Static directory for file uploads server/public/
-app.use(express.static(uploadsStaticDir));
-app.use(express.json());
-
 /*
  * Handles paths that aren't handled by any other route handler.
  * It responds with `index.html` to support page refreshes with React Router.

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-// import { Map } from '../components/Map';
 import { readPropertyAllUser, removeProperty } from '../lib';
 import { Property } from '../lib';
 import { useNavigate } from 'react-router-dom';
@@ -49,6 +48,10 @@ export function PropertyDetails() {
     navigate('/');
   }
 
+  function handleUpdate() {
+    navigate(`/update/${propertyId}`);
+  }
+
   return (
     <div className="p-4">
       <img src={property.imageUrl} alt="property picture" />
@@ -84,6 +87,15 @@ export function PropertyDetails() {
           onClick={handleDelete}>
           Delete Property
         </button>
+      )}
+      {user?.userId === property.agentId && (
+        <form onSubmit={handleUpdate}>
+          <button
+            className="bg-gray-800 text-gray-300 px-5 py-2 rounded-lg shadow-md hover:bg-gray-700 transition"
+            type="submit">
+            Update
+          </button>
+        </form>
       )}
     </div>
   );

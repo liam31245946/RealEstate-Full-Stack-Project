@@ -8,7 +8,7 @@ export function Navbar() {
   const handleUploadClick = () => {
     if (!user || user.role !== 'agent') {
       alert('Only Agent can upload properties');
-      navigate('/sign in ');
+      navigate('/sign-in ');
     } else {
       navigate('/upload');
     }

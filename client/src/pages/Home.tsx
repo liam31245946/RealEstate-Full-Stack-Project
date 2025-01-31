@@ -136,7 +136,7 @@ function PropertyCard({ property }: CardProps) {
       />
 
       <div className="p-4">
-        <h3 className="text-lg font-semibold">{price.toLocaleString()} $</h3>
+        <h3 className="text-lg font-semibold">$ {price.toLocaleString()}</h3>
         <div className="mt-2 flex flex-wrap gap-2 text-gray-300 text-sm">
           <span>🛏 {bedrooms} Bedrooms</span>
           <span>🛁 {bathrooms} Baths</span>

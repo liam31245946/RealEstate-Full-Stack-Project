@@ -1,8 +1,22 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from './useUser';
 import { TbHomeStar } from 'react-icons/tb';
 export function Navbar() {
   const { user, handleSignOut } = useUser();
+  const navigate = useNavigate();
+
+  const handleUploadClick = () => {
+    if (!user || user.role !== 'agent') {
+      alert('Only Agent can upload properties');
+      navigate('/sign in ');
+    } else {
+      navigate('/upload');
+    }
+  };
+  const handleSignOutNavigate = () => {
+    handleSignOut();
+    navigate('/');
+  };
   return (
     <nav className="bg-black text-white px-6 py-4 flex justify-between items-center">
       <div className="text-2xl font-bold">
@@ -29,13 +43,24 @@ export function Navbar() {
             </li>
           </>
         ) : (
-          <li>
-            <button
-              onClick={handleSignOut}
-              className="bg-red-500 px-4 py-2 rounded text-white hover:bg-red-600">
-              Sign Out
-            </button>
-          </li>
+          <>
+            {user.role === 'agent' && (
+              <li>
+                <button
+                  onClick={handleUploadClick}
+                  className="hover:text-blue-400">
+                  Upload
+                </button>
+              </li>
+            )}
+            <li>
+              <button
+                onClick={handleSignOutNavigate}
+                className="hover:text-blue-400">
+                Sign Out
+              </button>
+            </li>
+          </>
         )}
       </ul>
     </nav>

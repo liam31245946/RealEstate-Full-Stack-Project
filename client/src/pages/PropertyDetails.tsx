@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 // import { Map } from '../components/Map';
-import { removeFavorite, addFavorite, readPropertyAllUser } from '../lib';
-import { useUser } from '../components/useUser';
+import { readPropertyAllUser, removeProperty } from '../lib';
 import { Property } from '../lib';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../components/useUser';
 
 export function PropertyDetails() {
   const { propertyId } = useParams();
   const [property, setProperty] = useState<Property>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<unknown>();
+  const navigate = useNavigate();
   const { user } = useUser();
-
-  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     async function loadProperty(id: number) {
@@ -32,22 +32,6 @@ export function PropertyDetails() {
     }
   }, [propertyId]);
 
-  async function handleFavorite() {
-    if (!property || !user) return;
-
-    try {
-      if (isFavorite) {
-        await removeFavorite(property.propertyId);
-        setIsFavorite(false);
-      } else {
-        await addFavorite(property.propertyId);
-        setIsFavorite(true);
-      }
-    } catch (err) {
-      console.error('Error handling favorite:', err);
-    }
-  }
-
   if (isLoading) return <div>Loading...</div>;
   if (error) {
     return (
@@ -58,6 +42,12 @@ export function PropertyDetails() {
     );
   }
   if (!property) return null;
+
+  function handleDelete() {
+    if (!property?.propertyId) throw new Error('handle delete error');
+    removeProperty(property.propertyId);
+    navigate('/');
+  }
 
   return (
     <div className="p-4">
@@ -88,14 +78,11 @@ export function PropertyDetails() {
           </p>
         </div>
       </div>
-
-      {user && (
+      {user?.userId === property.agentId && (
         <button
-          onClick={handleFavorite}
-          className={`border border-gray-300 rounded py-1 px-3 mx-10 ${
-            isFavorite ? 'bg-red-500 text-white' : 'bg-gray-200'
-          }`}>
-          {isFavorite ? 'Unfavorite' : 'Favorite'}
+          className="bg-gray-800 text-gray-300 px-5 py-2 rounded-lg shadow-md hover:bg-gray-700 transition"
+          onClick={handleDelete}>
+          Delete Property
         </button>
       )}
     </div>

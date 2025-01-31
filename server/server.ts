@@ -1,7 +1,12 @@
 import 'dotenv/config';
 import express from 'express';
 import pg from 'pg';
-import { ClientError, errorMiddleware, authMiddleware } from './lib/index.js';
+import {
+  ClientError,
+  errorMiddleware,
+  authMiddleware,
+  uploadsMiddleware,
+} from './lib/index.js';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 
@@ -9,7 +14,7 @@ type User = {
   userId: number;
   username: string;
   hashedPassword: string;
-  role: string;
+  role: 'agent' | 'buyer';
   createdAt: Date;
 };
 
@@ -106,91 +111,96 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
 // sign in and sing out section End
 
 /* Agent user backend  Start */
-// add new properties
-app.post('/api/properties', authMiddleware, async (req, res, next) => {
-  try {
-    const {
-      description,
-      price,
-      size,
-      bedrooms,
-      bathrooms,
-      features,
-      numberAndStreet,
-      city,
-      state,
-      imageUrl,
-      zipCode,
-      status,
-    } = req.body;
-    const { userId, role } = req.user ?? {};
-    if (!description) {
-      throw new ClientError(400, 'Description is missing');
-    }
-    if (!price) {
-      throw new ClientError(400, 'Price is missing');
-    }
-    if (!size) {
-      throw new ClientError(400, 'Size is missing');
-    }
-    if (!bedrooms) {
-      throw new ClientError(400, 'Bedrooms is missing');
-    }
-    if (!bathrooms) {
-      throw new ClientError(400, 'Bathrooms is missing');
-    }
-    if (!numberAndStreet) {
-      throw new ClientError(400, 'numberAndStreet is missing');
-    }
-    if (!city) {
-      throw new ClientError(400, 'City is missing');
-    }
-    if (!state) {
-      throw new ClientError(400, 'State is missing');
-    }
-    if (!zipCode) {
-      throw new ClientError(400, 'zipCode is missing');
-    }
-    if (!status) {
-      throw new ClientError(400, 'Status is missing');
-    }
-    if (!features) {
-      throw new ClientError(400, 'Features is missing');
-    }
-    if (role !== 'agent') {
-      throw new ClientError(403, 'Must be an Agent');
-    }
-    if (!imageUrl) {
-      throw new ClientError(400, 'imageUrl is missing');
-    }
+// add new properties , Upload Here
+app.post(
+  '/api/properties',
+  authMiddleware,
+  uploadsMiddleware.single('image'),
+  async (req, res, next) => {
+    try {
+      const {
+        description,
+        price,
+        size,
+        bedrooms,
+        bathrooms,
+        features,
+        numberAndStreet,
+        city,
+        state,
+        zipCode,
+        status,
+      } = req.body;
+      const { userId, role } = req.user ?? {};
 
-    const sql = `
+      req.body.agentId = userId;
+
+      if (!description) {
+        throw new ClientError(400, 'Description is missing');
+      }
+      if (!price) {
+        throw new ClientError(400, 'Price is missing');
+      }
+      if (!size) {
+        throw new ClientError(400, 'Size is missing');
+      }
+      if (!bedrooms) {
+        throw new ClientError(400, 'Bedrooms is missing');
+      }
+      if (!bathrooms) {
+        throw new ClientError(400, 'Bathrooms is missing');
+      }
+      if (!numberAndStreet) {
+        throw new ClientError(400, 'numberAndStreet is missing');
+      }
+      if (!city) {
+        throw new ClientError(400, 'City is missing');
+      }
+      if (!state) {
+        throw new ClientError(400, 'State is missing');
+      }
+      if (!zipCode) {
+        throw new ClientError(400, 'zipCode is missing');
+      }
+      if (!status) {
+        throw new ClientError(400, 'Status is missing');
+      }
+      if (!features) {
+        throw new ClientError(400, 'Features is missing');
+      }
+      if (role !== 'agent') {
+        throw new ClientError(403, 'Must be an Agent');
+      }
+      const imageUrl = `/images/${req.file?.filename}`;
+
+      const sql = `
     insert into "properties"
       ( "description", "price", "size", "bedrooms", "bathrooms", "features", "numberAndStreet", "city", "state", "zipCode", "agentId", "status", "imageUrl")
       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       returning *`;
-    const params = [
-      description,
-      price,
-      size,
-      bedrooms,
-      bathrooms,
-      features,
-      numberAndStreet,
-      city,
-      state,
-      zipCode,
-      userId,
-      status,
-      imageUrl,
-    ];
-    const result = await db.query(sql, params);
-    const createdEntry = result.rows[0];
-    res.status(201).json(createdEntry);
-  } catch (err) {
-    next(err);
+      const params = [
+        description,
+        price,
+        size,
+        bedrooms,
+        bathrooms,
+        features,
+        numberAndStreet,
+        city,
+        state,
+        zipCode,
+        userId,
+        status,
+        imageUrl,
+      ];
+      const result = await db.query(sql, params);
+      const createdEntry = result.rows[0];
+      res.status(201).json(createdEntry);
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 // property delete
 app.delete(
@@ -279,26 +289,22 @@ app.get('/api/properties', async (req, res, next) => {
 
 // Get all property the agent entered
 
-app.get(
-  '/api/properties/:propertyId',
-  authMiddleware,
-  async (req, res, next) => {
-    try {
-      const { propertyId } = req.params;
-      const sql = `SELECT * FROM "properties" WHERE "propertyId" = $1`;
-      const params = [propertyId];
-      const result = await db.query(sql, params);
+app.get('/api/properties/', authMiddleware, async (req, res, next) => {
+  try {
+    const { propertyId } = req.params;
+    const sql = `SELECT * FROM "properties" WHERE "propertyId" = $1`;
+    const params = [propertyId];
+    const result = await db.query(sql, params);
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Property not found' });
-      }
-
-      res.json(result.rows[0]);
-    } catch (err) {
-      next(err);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found' });
     }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    next(err);
   }
-);
+});
 
 // Get back the id for each property
 

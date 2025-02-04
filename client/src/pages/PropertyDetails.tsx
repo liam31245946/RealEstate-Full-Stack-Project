@@ -4,6 +4,7 @@ import { readPropertyAllUser, removeProperty } from '../lib';
 import { Property } from '../lib';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../components/useUser';
+import { MapAddress } from '../components/MapAddress';
 
 export function PropertyDetails() {
   const { propertyId } = useParams();
@@ -31,7 +32,9 @@ export function PropertyDetails() {
     }
   }, [propertyId]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return <div className="text-center text-gold text-xl">Loading...</div>;
+
   if (error) {
     return (
       <div className="text-center text-red-500">
@@ -40,6 +43,7 @@ export function PropertyDetails() {
       </div>
     );
   }
+
   if (!property) return null;
 
   function handleDelete() {
@@ -53,50 +57,68 @@ export function PropertyDetails() {
   }
 
   return (
-    <div className="p-4">
-      <img src={property.imageUrl} alt="property picture" />
-
-      <div>
-        <h3>What's Special</h3>
-        <p>{property.description}</p>
+    <div className="bg-black text-white min-h-screen w-full flex flex-col">
+      {/* Property Image */}
+      <div className="w-full flex justify-center">
+        <img
+          src={property.imageUrl}
+          alt="property picture"
+          className="rounded-lg shadow-lg w-full max-w-4xl"
+        />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Property Details */}
+      <div className="mt-8">
+        <h3 className="text-3xl text-gold font-bold">What's Special</h3>
+        <p className="text-gray-300 mt-3">{property.description}</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-6 mt-6 ">
         <div>
-          <p>${property.price.toLocaleString()}</p>
-          <div className="flex gap-5">
+          <p className="text-3xl text-gold font-semibold">
+            ${property.price.toLocaleString()}
+          </p>
+          <div className="flex gap-5 text-gray-300 mt-3">
             <p>🛏 {property.bedrooms} Bedrooms</p>
-            <p>🛁{property.bathrooms} Bathrooms</p>
-            <p>{property.size} sqft</p>
+            <p>🛁 {property.bathrooms} Bathrooms</p>
+            <p>📏 {property.size} sqft</p>
           </div>
 
-          <div>
-            <h3>Features</h3>
-            <p>{property.features}</p>
+          <div className="mt-6">
+            <h3 className="text-2xl text-gold font-bold">Features</h3>
+            <p className="text-gray-300 mt-2">{property.features}</p>
           </div>
 
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gold-500 mt-6">
             {property.numberAndStreet}, {property.city}, {property.state}{' '}
             {property.zipCode}
           </p>
+          <MapAddress
+            numberAndStreet={property.numberAndStreet}
+            city={property.city}
+            state={property.state}
+            zipCode={property.zipCode}
+          />
+          {/* Agent Actions */}
+          {user?.userId === property.agentId && (
+            <div className="mt-8 flex gap-4">
+              <button
+                className="bg-red-600 hover:bg-red-700 px-5 py-2 rounded-lg text-white font-semibold shadow-md transition"
+                onClick={handleDelete}>
+                Delete Property
+              </button>
+
+              <form onSubmit={handleUpdate}>
+                <button
+                  className="bg-gray-800 text-gray-300 px-5 py-2 rounded-lg shadow-md hover:bg-gray-700 transition"
+                  type="submit">
+                  Update
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </div>
-      {user?.userId === property.agentId && (
-        <button
-          className="bg-gray-800 text-gray-300 px-5 py-2 rounded-lg shadow-md hover:bg-gray-700 transition"
-          onClick={handleDelete}>
-          Delete Property
-        </button>
-      )}
-      {user?.userId === property.agentId && (
-        <form onSubmit={handleUpdate}>
-          <button
-            className="bg-gray-800 text-gray-300 px-5 py-2 rounded-lg shadow-md hover:bg-gray-700 transition"
-            type="submit">
-            Update
-          </button>
-        </form>
-      )}
     </div>
   );
 }

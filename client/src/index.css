@@ -4,3 +4,6 @@
 
 /* @import url('~slick-carousel/slick/slick.css');
 @import url('~slick-carousel/slick/slick-theme.css'); */
+body {
+  background-color: black;
+}

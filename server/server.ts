@@ -45,6 +45,9 @@ export type properties = {
 const hashKey = process.env.TOKEN_SECRET;
 if (!hashKey) throw new Error('TOKEN_SECRET not found in .env');
 
+const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+if (!hashKey) throw new Error('Google Map Api Key not found in .env');
+
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -275,7 +278,6 @@ app.put(
         state,
         zipCode,
         numberAndStreet,
-        imageUrl,
       } = req.body;
 
       const update = [];
@@ -328,7 +330,9 @@ app.put(
         update.push(`"numberAndStreet" =$${i++}`);
         values.push(numberAndStreet);
       }
-      if (imageUrl) {
+      // this is where update image happens
+      if (req.file?.filename) {
+        const imageUrl = `/images/${req.file?.filename}`;
         update.push(`"imageUrl" =$${i++}`);
         values.push(imageUrl);
       }
@@ -713,6 +717,38 @@ app.post(
     }
   }
 );
+
+/* Map and Geo code */
+
+app.get('/api/geocode', async (req, res, next) => {
+  const { numberAndStreet, city, state, zipCode } = req.query;
+
+  if (!numberAndStreet || !city || !state || !zipCode) {
+    return res.status(400).json({ error: 'Missing required address fields.' });
+  }
+
+  const fullAddress = `${numberAndStreet}, ${city}, ${state}, ${zipCode}`;
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+    fullAddress as string
+  )}&key=${apiKey}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status === 'OK' && data.results.length > 0) {
+      const location = data.results[0].geometry.location;
+      return res.json({ lat: location.lat, lng: location.lng });
+    } else {
+      console.error('Geocoding failed:', data.status);
+      return res
+        .status(500)
+        .json({ error: `Geocoding failed: ${data.status}` });
+    }
+  } catch (err) {
+    next(err);
+  }
+});
 
 /* review backend End */
 /*

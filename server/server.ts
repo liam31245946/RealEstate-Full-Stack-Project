@@ -363,9 +363,9 @@ app.put(
 
 //  Implement Filter
 
-app.get('/api/properties', async (req, res, next) => {
+app.post('/api/properties/filter', async (req, res, next) => {
   try {
-    const { minPrice, maxPrice, bedrooms, bathrooms, city, status } = req.query;
+    const { minPrice, maxPrice, bedrooms, bathrooms, city, status } = req.body;
     let sql = `
       select * from "properties" where 1=1
     `;

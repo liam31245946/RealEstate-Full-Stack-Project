@@ -15,7 +15,6 @@ export function UploadForm() {
     event.preventDefault();
     try {
       const formData = new FormData(event.currentTarget);
-      console.log([...formData.entries()]);
 
       formData.append('agentId', String(user?.userId));
 

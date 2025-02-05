@@ -183,3 +183,17 @@ export async function readFavorites(): Promise<Property[]> {
   }
   return (await response.json()) as Property[];
 }
+
+export async function readPropertiesFiltered(
+  filters: Record<string, string>
+): Promise<Property[]> {
+  const response = await fetch('/api/properties/filter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(filters),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch filtered properties');
+  }
+  return response.json();
+}

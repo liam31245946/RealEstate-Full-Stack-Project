@@ -1,36 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '../components/useUser';
-import { Property, readPropertiesAllUser } from '../lib';
+import {
+  Property,
+  readPropertiesAllUser,
+  readPropertiesFiltered,
+} from '../lib';
 import { Link } from 'react-router-dom';
-import { Select } from './Select';
-import { MinPrice } from './MinPrice';
-import { MaxPrice } from './MaxPrice';
-import { Bedrooms } from './Bedrooms';
-import { Bathrooms } from './Bathrooms';
-import { City } from './City';
+import { FilterBar } from './FilterBar';
 
 export function Home() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>();
   const { user } = useUser();
-
-  // Filter State
-  const [filters, setFilters] = useState({
-    status: '',
-    minPrice: '',
-    maxPrice: '',
-    bedrooms: '',
-    bathrooms: '',
-    city: '',
-  });
-
-  // Handle Input Change
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
-  };
 
   useEffect(() => {
     async function load() {
@@ -56,6 +38,16 @@ export function Home() {
       </div>
     );
   }
+
+  function handleFilter(filters: Record<string, string>) {
+    // Use the filters to fetch properties and update state
+    readPropertiesFiltered(filters)
+      .then(setProperties)
+      .catch((err) => {
+        alert('Filter failed: ' + err);
+      });
+  }
+
   return (
     <div className="bg-black text-white min-h-screen">
       {/* Background Image Section */}
@@ -63,31 +55,13 @@ export function Home() {
         <img
           src="https://dropinblog.net/34246798/files/featured/Mountain_House_-_Between_Dream__amp__Reality.png"
           alt="Luxury Home"
-          className="w-full h-screen object-cover"
+          className="w-full h-screen"
         />
       </div>
 
       {/* Filter Section */}
       <div className="bg-gray-900 p-6 shadow-lg text-white flex flex-wrap justify-center gap-4">
-        <button className="bg-gold hover:bg-yellow-600 px-4 py-2 rounded text-black">
-          All
-        </button>
-
-        <Select value={filters.status} onChange={handleInputChange} />
-
-        <MinPrice value={filters.minPrice} onChange={handleInputChange} />
-
-        <MaxPrice value={filters.maxPrice} onChange={handleInputChange} />
-
-        <Bedrooms value={filters.bedrooms} onChange={handleInputChange} />
-
-        <Bathrooms value={filters.bathrooms} onChange={handleInputChange} />
-
-        <City value={filters.city} onChange={handleInputChange} />
-
-        <button className="bg-gold hover:bg-yellow-600 px-4 py-2 rounded text-black">
-          Apply Filters
-        </button>
+        <FilterBar onFilter={handleFilter} />
       </div>
 
       {/* Property Listings Section */}

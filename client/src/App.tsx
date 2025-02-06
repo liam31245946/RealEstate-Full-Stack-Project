@@ -7,6 +7,7 @@ import { UserProvider } from './components/UserContext';
 import { NotFound } from './pages/notFound';
 import { UploadForm } from './components/UploadForm';
 import { UpDateForm } from './components/UpdateForm';
+import { FavoritesPage } from './pages/FavoritePage';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/sign-in" element={<AuthPage mode="sign-in" />} />
         <Route path="/upload" element={<UploadForm />} />
         <Route path="/update/:propertyId" element={<UpDateForm />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </UserProvider>

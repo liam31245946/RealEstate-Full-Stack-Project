@@ -29,6 +29,11 @@ export function Navbar() {
             Home
           </Link>
         </li>
+        <li>
+          <Link to="/favorites" className="hover:text-orange-500">
+            Save
+          </Link>
+        </li>
         {!user ? (
           <>
             <li>

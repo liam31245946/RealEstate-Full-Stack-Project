@@ -5,6 +5,7 @@ import { Property } from '../lib';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../components/useUser';
 import { MapAddress } from '../components/MapAddress';
+import { FavoriteButton } from '../components/FavoriteButton';
 
 export function PropertyDetails() {
   const { propertyId } = useParams();
@@ -99,6 +100,10 @@ export function PropertyDetails() {
             state={property.state}
             zipCode={property.zipCode}
           />
+          {/* Favorite Button */}
+          <div className="flex justify-center mt-4">
+            <FavoriteButton propertyId={property.propertyId} />
+          </div>
           {/* Agent Actions */}
           {user?.userId === property.agentId && (
             <div className="mt-8 flex gap-4">

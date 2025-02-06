@@ -14,7 +14,7 @@ type User = {
   userId: number;
   username: string;
   hashedPassword: string;
-  role: 'agent' | 'buyer';
+  role: 'agent' | 'buyer' | 'admin';
   createdAt: Date;
 };
 
@@ -393,7 +393,7 @@ app.post('/api/properties/filter', async (req, res, next) => {
       params.push(Number(bathrooms));
     }
     if (city) {
-      sql += ` AND "city" >= $${params.length + 1}`;
+      sql += ` AND "city" ilike $${params.length + 1}`;
       params.push(`%${city}%`);
     }
 
@@ -515,19 +515,20 @@ app.delete(
   authMiddleware,
   async (req, res, next) => {
     try {
-      const favoriteId = req.params;
+      const { userId } = req.user ?? {};
+      const { propertyId } = req.params;
       const sql = `
-    delete from "favorites"
-      where "userId" = $1 AND "propertyId" = $2
-      returning *;
-    `;
-      const params = [favoriteId];
+        DELETE FROM "favorites"
+        WHERE "userId" = $1 AND "propertyId" = $2
+        RETURNING *;
+      `;
+      const params = [userId, propertyId];
       const result = await db.query(sql, params);
-      const deleteFav = result.rows[0];
-      if (!deleteFav) {
-        throw new ClientError(404, 'Favorites not found');
+      const deletedFav = result.rows[0];
+      if (!deletedFav) {
+        throw new ClientError(404, 'Favorite not found');
       }
-      res.status(204).json(deleteFav);
+      res.status(204).json(deletedFav);
     } catch (err) {
       next(err);
     }

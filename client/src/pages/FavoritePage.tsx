@@ -1,7 +1,6 @@
-// FavoritesPage.tsx
 import { useState, useEffect } from 'react';
-import { Property } from '../lib'; // Assuming you have a Property type defined
-import { PropertyCard } from './PropertyCard'; // Adjust the import path as needed
+import { Property } from '../lib';
+import { PropertyCard } from './PropertyCard';
 
 export function FavoritesPage() {
   const [favorites, setFavorites] = useState<Property[]>([]);
@@ -9,6 +8,7 @@ export function FavoritesPage() {
 
   useEffect(() => {
     async function fetchFavorites() {
+      // the token from SignInForm.tsx
       const token = localStorage.getItem('token');
       if (!token) {
         setLoading(false);
@@ -42,7 +42,7 @@ export function FavoritesPage() {
     <div className="bg-black text-white min-h-screen p-4">
       <h1 className="text-3xl font-bold mb-6">Your Favorite Properties</h1>
       {favorites.length === 0 ? (
-        <p>You haven’t favorited any properties yet.</p>
+        <p>Your Favored List Is Empty</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((property) => (

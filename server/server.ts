@@ -213,10 +213,11 @@ app.post(
   }
 );
 
-// property delete
+// property delete (this is where 10 bugs happened. It's working now do not touch it in the future)
 app.delete(
   '/api/properties/:propertyId',
   authMiddleware,
+  uploadsMiddleware.single('image'),
   async (req, res, next) => {
     try {
       const { userId, role } = req.user ?? {};
@@ -229,7 +230,7 @@ app.delete(
       }
 
       // Ensure agent only deletes their own properties
-      const checkOwnershipSQL = `SELECT * FROM properties WHERE "propertyId" = $1 AND "agentId" = $2`;
+      const checkOwnershipSQL = `select * from "properties" where "propertyId" = $1 and "agentId" = $2`;
       const ownershipResult = await db.query(checkOwnershipSQL, [
         propertyId,
         userId,
@@ -241,7 +242,13 @@ app.delete(
           .json({ error: 'You can only delete your own properties' });
       }
 
-      const sql = `DELETE FROM properties WHERE "propertyId" = $1 RETURNING *`;
+      // this will delete favorite first, leave no trace of it
+      await db.query(`delete from "favorites" where "propertyId" = $1`, [
+        propertyId,
+      ]);
+
+      // Now delete the property itself
+      const sql = `delete from "properties" where "propertyId" = $1 returning *`;
       const result = await db.query(sql, [propertyId]);
 
       if (result.rows.length === 0) {
@@ -385,11 +392,11 @@ app.post('/api/properties/filter', async (req, res, next) => {
       params.push(Number(maxPrice));
     }
     if (bedrooms) {
-      sql += ` and "bedrooms" >= $${params.length + 1}`;
+      sql += ` and "bedrooms" = $${params.length + 1}`;
       params.push(Number(bedrooms));
     }
     if (bathrooms) {
-      sql += ` and "bathrooms" >= $${params.length + 1}`;
+      sql += ` and "bathrooms" = $${params.length + 1}`;
       params.push(Number(bathrooms));
     }
     if (city) {

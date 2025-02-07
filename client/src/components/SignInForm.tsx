@@ -30,9 +30,11 @@ export function SignInForm() {
         throw new Error(`Error: ${res.status}`);
       }
       const { user, token } = (await res.json()) as AuthData;
+
       //token for favorite
       localStorage.setItem('token', token);
       //
+
       handleSignIn(user, token);
       navigate('/');
     } catch (err) {

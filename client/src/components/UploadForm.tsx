@@ -9,7 +9,6 @@ export function UploadForm() {
   const navigate = useNavigate();
   const { user } = useUser();
   const [uploaded, setUploaded] = useState<Property>();
-  // const [imageUrl, setImageUrl] = useState('');
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,9 +34,6 @@ export function UploadForm() {
       alert('Upload failed, please try again.');
     }
   }
-  // function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-  //   setImageUrl(event.target.value);
-  // }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#121212] to-[#1c1c1c]">
@@ -168,19 +164,6 @@ export function UploadForm() {
               accept=".png, .jpg, .jpeg, .gif, .webp"
               className="w-full bg-[#222] text-white rounded-lg px-4 py-2 border border-gray-700 focus:border-yellow-500 focus:ring-yellow-400 outline-none transition"
             />
-            {/* <div>
-              <p className="text-gray-400">OR</p>
-            </div>
-            <div className="flex items-center bg-[#222] text-white rounded-lg border border-gray-700 px-4 py-2">
-              <input
-                type="text"
-                placeholder="Paste image URL here ..."
-                value={imageUrl}
-                onChange={handleInputChange}
-                accept=".png, .jpg, .jpeg, .gif,.webp"
-                className="w-full bg-transparent outline-none text-white"
-              />
-            </div> */}
           </label>
 
           <button

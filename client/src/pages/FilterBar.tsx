@@ -22,7 +22,6 @@ export function FilterBar({ onFilter }: FilterBarProps) {
 
   function handleFilterSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Pass the current filters back to the parent component
     onFilter(filters);
   }
 

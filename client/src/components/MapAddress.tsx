@@ -20,7 +20,7 @@ export function MapAddress({ numberAndStreet, city, state, zipCode }: Props) {
     lng: number;
   } | null>(null);
 
-  // Use the appropriate environment variable for your front end.
+  // api stuff
   const apiKey = 'AIzaSyBDnDYwFE87WwpDY6wiyvmMX7w31qmjo_A';
   if (!apiKey) {
     throw new Error('Missing Google Maps API key.');

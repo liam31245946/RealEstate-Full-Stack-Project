@@ -49,6 +49,7 @@ export function Navbar() {
           </>
         ) : (
           <>
+            {/* only agent can see this upload button*/}
             {user.role === 'agent' && (
               <li>
                 <button
@@ -58,6 +59,7 @@ export function Navbar() {
                 </button>
               </li>
             )}
+
             <li>
               <button
                 onClick={handleSignOutNavigate}

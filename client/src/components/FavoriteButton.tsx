@@ -41,7 +41,7 @@ export function FavoriteButton({ propertyId }: FavoriteButtonProps) {
     }
     try {
       if (isFavorite) {
-        // Remove favorite using DELETE endpoint
+        // Remove favorite
         const response = await fetch(`/api/favorites/${propertyId}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
@@ -52,7 +52,7 @@ export function FavoriteButton({ propertyId }: FavoriteButtonProps) {
           console.error('Error removing favorite.');
         }
       } else {
-        // Add favorite using POST endpoint
+        // Add favorite
         const response = await fetch('/api/favorites', {
           method: 'POST',
           headers: {

@@ -4,7 +4,7 @@ import { readToken, readUser, removeAuth, saveAuth } from '../lib/data';
 export type User = {
   userId: number;
   username: string;
-  role: `agent` | 'buyer';
+  role: `agent` | 'buyer' | 'admin';
 };
 
 export type UserContextValues = {

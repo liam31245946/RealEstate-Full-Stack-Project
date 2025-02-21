@@ -25,12 +25,10 @@ This platform allows users to browse, filter, and favorite property listings. Ag
 ### 👤 Registered Users
 - ✅ Create an account and sign in  
 - ⭐ Favorite properties to save for later  
-- 💬 Send messages to agents about listings  
 
 ### 🏡 Agents
 - ➕ Add, update, or delete property listings  
 - 👁️ View which users have favorited their properties  
-- 📩 Respond to messages from registered users  
 
 ### 🔒 Admin
 - ✔️ Approve or reject property listings submitted by agents  

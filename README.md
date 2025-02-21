@@ -39,11 +39,6 @@ This platform allows users to browse, filter, and favorite property listings. Ag
 
 ### 🌐 Additional Features
 - 🗺️ Map integration to visualize property locations  
-- 🖼️ Property image carousel for a better visual experience  
-- 💬 Messaging system for direct communication  
-- ⭐ Review and feedback system for agents  
-
----
 
 ## 💻 **Tech Stack**
 
@@ -55,11 +50,10 @@ This platform allows users to browse, filter, and favorite property listings. Ag
 | **Auth**    | JWT-based authentication, Role-based Access Control |
 | **Maps**    | Google Maps API                        |
 
----
+![image](https://github.com/user-attachments/assets/ae762cd6-f3e6-4510-85ba-3b6f19a0ad18)
+![image](https://github.com/user-attachments/assets/c19c9688-2770-4bed-b718-de1d10eaa342)
+![image](https://github.com/user-attachments/assets/fce16556-333a-4503-aced-c245c99c98e5)
+![image](https://github.com/user-attachments/assets/6421d3eb-d1c6-45df-9147-62b44e4129f6)
 
-## 🔧 **Installation & Setup**
 
-### 1️⃣ Clone the Repository
-```bash
-git clone https://github.com/yourusername/dreamhome-real-estate-app.git
-cd dreamhome-real-estate-app
+

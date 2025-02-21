@@ -59,7 +59,7 @@ export async function readProperties(): Promise<Property[]> {
   };
   const response = await fetch('/api/properties', req);
   if (!response.ok) {
-    throw new Error('Failed to fetch catalog');
+    throw new Error('Failed to fetch readProperties');
   }
 
   const data = (await response.json()) as Property[];
@@ -84,7 +84,7 @@ export async function readProperty(
 export async function readPropertiesAllUser(): Promise<Property[]> {
   const response = await fetch('/api/properties-allUser');
   if (!response.ok) {
-    throw new Error('Failed to fetch catalog');
+    throw new Error('Failed to fetch readPropAllUser');
   }
 
   const data = (await response.json()) as Property[];
@@ -172,6 +172,7 @@ export async function removeFavorite(propertyId: number): Promise<void> {
     throw new Error(`HTTP error! Status: ${response.status}`);
   }
 }
+
 export async function readFavorites(): Promise<Property[]> {
   const response = await fetch('/api/favorites', {
     headers: {

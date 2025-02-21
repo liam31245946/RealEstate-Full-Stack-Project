@@ -30,7 +30,7 @@ CREATE TABLE "properties" (
   "zipCode" text,
   "agentId" integer,
   "status" text,
-  "imageUrl" json,
+  "imageUrl" text,
   "createdAt" timestamptz,
   "approvedBy" integer,
   "approvedDate" timestamptz
